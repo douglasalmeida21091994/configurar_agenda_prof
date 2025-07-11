@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurar Agenda Profissional</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert2/11.7.32/sweetalert2.all.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #6C5CE7;
+            --primary-dark: #5F4DD0;
+            --primary-light: #A29BFE;
+            --secondary-color: #00CEC9;
+            --secondary-dark: #00B5B1;
+            --accent-color: #FD79A8;
+            --success-color: #4CD137;
+            --warning-color: #fb0;
+            --danger-color: #E84118;
+            --text-dark: #2D3436;
+            --text-light: #636E72;
+            --background-light: #F5F5F5;
+            --background-white: #FFFFFF;
+            --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 4px 15px rgba(0, 0, 0, 0.15);
+            --shadow-large: 0 8px 30px rgba(0, 0, 0, 0.2);
+            --border-radius-sm: 5px;
+            --border-radius-md: 10px;
+            --border-radius-lg: 15px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background-light) 0%, #E8E8E8 100%);
+            color: var(--text-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 2000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: var(--background-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-light);
+            padding: 25px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: var(--transition-fast);
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary-dark);
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-title i {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+            color: white;
+            padding: 12px;
+            border-radius: var(--border-radius-md);
+            font-size: 20px;
+        }
+
+        .form-card {
+            background: var(--background-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-medium);
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #E8E8E8;
+            border-radius: var(--border-radius-md);
+            font-size: 16px;
+            transition: var(--transition-normal);
+            background: var(--background-white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+        }
+
+        .form-control:disabled {
+            background: #f8f9fa;
+            color: var(--text-light);
+        }
+
+        .form-control.error {
+            border-color: var(--danger-color);
+        }
+
+        .error-message {
+            color: var(--danger-color);
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .select-wrapper {
+            position: relative;
+        }
+
+        .select-wrapper::after {
+            content: '\f107';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            pointer-events: none;
+        }
+
+        .form-control select {
+            appearance: none;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        .day-selector {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .day-btn {
+            padding: 10px 15px;
+            border: 2px solid #E8E8E8;
+            border-radius: var(--border-radius-md);
+            background: var(--background-white);
+            color: var(--text-dark);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .day-btn:hover {
+            border-color: var(--primary-color);
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .day-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .day-schedule {
+            display: none;
+            background: #f9f9f9;
+            border-radius: var(--border-radius-md);
+            padding: 15px;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .day-schedule.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .period-option {
+            margin-bottom: 15px;
+        }
+
+        .period-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .period-title i {
+            color: var(--primary-color);
+        }
+
+        .period-btn {
+            padding: 8px 12px;
+            border: 2px solid #E8E8E8;
+            border-radius: var(--border-radius-sm);
+            background: var(--background-white);
+            color: var(--text-dark);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .period-btn:hover {
+            border-color: var(--primary-color);
+        }
+
+        .period-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .time-input {
+            flex: 1;
+        }
+
+        .age-inputs {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .age-input {
+            flex: 1;
+        }
+
+        .search-group {
+            position: relative;
+        }
+
+        .search-group input {
+            padding-right: 50px;
+        }
+
+        .search-group .search-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition-normal);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-secondary {
+            background: var(--background-white);
+            color: var(--text-dark);
+            border: 2px solid #E8E8E8;
+        }
+
+        .btn-secondary:hover {
+            background: #f8f9fa;
+            border-color: var(--primary-color);
+        }
+
+        .table-card {
+            background: var(--background-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-medium);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-header h3 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .modern-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .modern-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            border-bottom: 2px solid #E8E8E8;
+        }
+
+        .modern-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        .modern-table tr:hover {
+            background: rgba(108, 92, 231, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: var(--border-radius-sm);
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: rgba(76, 209, 55, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-inactive {
+            background: rgba(253, 121, 168, 0.1);
+            color: var(--accent-color);
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: var(--border-radius-sm);
+            font-size: 12px;
+            cursor: pointer;
+            transition: var(--transition-fast);
+            margin: 0 2px;
+        }
+
+        .btn-edit {
+            background: rgba(0, 206, 201, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .btn-edit:hover {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-delete {
+            background: rgba(232, 65, 24, 0.1);
+            color: var(--danger-color);
+        }
+
+        .btn-delete:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-activate {
+            background: rgba(76, 209, 55, 0.1);
+            color: var(--success-color);
+        }
+
+        .btn-activate:hover {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .loading {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-large);
+            z-index: 1000;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para sugestões de procedimentos */
+        .suggestions-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #E8E8E8;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-medium);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f3f4;
+            transition: var(--transition-fast);
+        }
+
+        .suggestion-item:hover,
+        .suggestion-item.selected {
+            background: rgba(108, 92, 231, 0.1);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-item strong {
+            display: block;
+            color: var(--text-dark);
+            font-size: 14px;
+        }
+
+        .suggestion-item small {
+            color: var(--text-light);
+            font-size: 12px;
+            margin-top: 2px;
+            display: block;
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-card {
+            animation: slideInUp 0.5s ease-out;
+        }
+
+        .table-card {
+            animation: slideInUp 0.7s ease-out;
+        }
+
+        /* Melhorias na responsividade */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .day-selector {
+                justify-content: center;
+            }
+
+            .time-inputs,
+            .age-inputs {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .form-card {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 22px;
+            }
+
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .modern-table {
+                font-size: 12px;
+            }
+
+            .modern-table th,
+            .modern-table td {
+                padding: 10px 8px;
+            }
+        }
+
+        /* Novo estilo para seção de configuração */
+        .config-section {
+            background: #f8f9fa;
+            border-radius: var(--border-radius-md);
+            padding: 20px;
+            margin-top: 30px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .config-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .config-section-title i {
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <div class="breadcrumb">
+                    <a href="#"><i class="fas fa-home"></i> Ocorrências</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="#">Prontuário Eletrônico</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="#">Agendamentos</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <a href="#">Agendas dos Profissionais</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Configurar Agenda</span>
+                </div>
+                <div class="page-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    Nova Agenda Profissional
+                </div>
+            </div>
+            <div style="text-align: right; color: var(--text-light);">
+                <i class="fas fa-calendar"></i> Quinta-feira, 10/07/2025
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <form id="agendaForm">
+                <div class="form-grid">
+                    <!-- Filtros encadeados -->
+                    <div class="form-group">
+                        <label for="unidade">Unidade de Saúde:</label>
+                        <div class="select-wrapper">
+                            <select id="unidade" name="unidade" class="form-control" required>
+                                <option value="">Selecione uma unidade</option>
+                                <option value="1">UBS Centro</option>
+                                <option value="2">UBS Vila Nova</option>
+                                <option value="3">UBS Jardim das Flores</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="especialidade">Especialidade:</label>
+                        <div class="select-wrapper">
+                            <select id="especialidade" name="especialidade" class="form-control" disabled required>
+                                <option value="">Selecione primeiro a unidade</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profissional">Profissional:</label>
+                        <div class="select-wrapper">
+                            <select id="profissional" name="profissional" class="form-control" disabled required>
+                                <option value="">Selecione primeiro a especialidade</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="procedimento">Procedimento:</label>
+                        <div class="search-group">
+                            <input type="text" id="procedimento" name="procedimento" class="form-control"
+                                placeholder="Digite para buscar procedimentos..." autocomplete="off" disabled>
+                            <i class="fas fa-search search-icon"></i>
+                        </div>
+                        <div id="procedimento_suggestions" class="suggestions-list"></div>
+                    </div>
+                </div>
+
+                <!-- Seção de Configuração da Agenda -->
+                <div class="config-section">
+                    <div class="config-section-title">
+                        <i class="fas fa-cog"></i> Configuração da Agenda
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="vigencia">Vigência:</label>
+                            <div class="time-inputs">
+                                <div class="time-input">
+                                    <input type="date" id="vigencia_inicio" name="vigencia_inicio" class="form-control"
+                                        disabled>
+                                </div>
+                                <span>até</span>
+                                <div class="time-input">
+                                    <input type="date" id="vigencia_fim" name="vigencia_fim" class="form-control"
+                                        disabled>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Agendamento:</label>
+                            <div class="select-wrapper">
+                                <select id="tipo" name="tipo" class="form-control" disabled>
+                                    <option value="">Selecione o tipo</option>
+                                    <option value="1">Ordem de chegada</option>
+                                    <option value="2">Horário marcado</option>
+                                    <option value="3">Encaixe</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Campo dinâmico baseado no tipo de agendamento -->
+                        <div class="form-group" id="quantidade_container" style="display: none;">
+                            <label for="quantidade_beneficiarios">Quantidade de Beneficiários:</label>
+                            <input type="number" id="quantidade_beneficiarios" name="quantidade_beneficiarios"
+                                class="form-control" min="1" disabled>
+                        </div>
+
+                        <div class="form-group" id="duracao_container" style="display: none;">
+                            <label for="duracao_atendimento">Duração do Atendimento (minutos):</label>
+                            <input type="number" id="duracao_atendimento" name="duracao_atendimento"
+                                class="form-control" min="20" max="120" disabled>
+                            <div class="error-message" id="duracao_error">Duração deve ser entre 20 e 120 minutos</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="faixa_etaria">Faixa Etária:</label>
+                            <div class="age-inputs">
+                                <div class="age-input">
+                                    <input type="number" id="idade_min" name="idade_min" class="form-control"
+                                        placeholder="Mín" min="0" disabled>
+                                </div>
+                                <span>até</span>
+                                <div class="age-input">
+                                    <input type="number" id="idade_max" name="idade_max" class="form-control"
+                                        placeholder="Máx" min="0" disabled>
+                                </div>
+                            </div>
+                            <div class="error-message" id="idade_error">Idade mínima não pode ser maior que a máxima
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Configuração de dias e horários -->
+                    <div class="form-group">
+                        <label>Dias de Agendamento:</label>
+                        <div class="day-selector">
+                            <div class="day-btn" data-day="SEG">SEG</div>
+                            <div class="day-btn" data-day="TER">TER</div>
+                            <div class="day-btn" data-day="QUA">QUA</div>
+                            <div class="day-btn" data-day="QUI">QUI</div>
+                            <div class="day-btn" data-day="SEX">SEX</div>
+                            <div class="day-btn" data-day="SAB">SAB</div>
+                        </div>
+                    </div>
+
+                    <!-- Configuração de horários por dia -->
+                    <div id="day-schedules-container">
+                        <!-- Os horários por dia serão gerados dinamicamente aqui -->
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn btn-secondary" id="voltarBtn">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                    <button type="submit" class="btn btn-primary" id="cadastrarBtn" disabled>
+                        <i class="fas fa-save"></i> Cadastrar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Table Card -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3><i class="fas fa-list"></i> Agendas Cadastradas</h3>
+                <div style="color: rgba(255,255,255,0.8); font-size: 14px;">
+                    <i class="fas fa-calendar-check"></i> Últimas atualizações
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="modern-table">
+                    <thead>
+                        <tr>
+                            <th>Cód</th>
+                            <th>Vigência</th>
+                            <th>Dia(s)</th>
+                            <th>Horários</th>
+                            <th>Especialidade</th>
+                            <th>Procedimento</th>
+                            <th>Tipo</th>
+                            <th>Idade</th>
+                            <th>Situação</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="agendasTable">
+                        <!-- Dados serão carregados dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+        <p style="margin-top: 10px;">Carregando...</p>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Inicialização
+            initializeComponents();
+            setupEventListeners();
+
+            // Carregar dados mockados inicialmente
+            loadMockedAgendas();
+        });
+
+        function initializeComponents() {
+            // Configurar datas padrão
+            const hoje = new Date();
+            const proximoMes = new Date(hoje.getFullYear(), hoje.getMonth() + 1, hoje.getDate());
+
+            $('#vigencia_inicio').val(hoje.toISOString().split('T')[0]);
+            $('#vigencia_fim').val(proximoMes.toISOString().split('T')[0]);
+
+            // Criar templates de horários para cada dia
+            createDayScheduleTemplates();
+        }
+
+        function createDayScheduleTemplates() {
+            const days = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'];
+            const container = $('#day-schedules-container');
+            container.empty();
+
+            days.forEach(day => {
+                const template = $(`
+                    <div class="day-schedule" id="schedule-${day}">
+                        <div class="period-option">
+                            <div class="period-title">
+                                <i class="fas fa-clock"></i> Período Completo
+                            </div>
+                            <button type="button" class="period-btn" data-period="full" data-day="${day}">
+                                Selecionar Período Completo
+                            </button>
+                            <div class="time-inputs" id="${day}-full" style="display: none;">
+                                <div class="time-input">
+                                    <input type="time" id="${day}_full_start" name="${day}_full_start" class="form-control" disabled>
+                                </div>
+                                <span>às</span>
+                                <div class="time-input">
+                                    <input type="time" id="${day}_full_end" name="${day}_full_end" class="form-control" disabled>
+                                </div>
+                                <div class="error-message" id="${day}_full_error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="period-option">
+                            <div class="period-title">
+                                <i class="fas fa-sun"></i> Período da Manhã
+                            </div>
+                            <button type="button" class="period-btn" data-period="morning" data-day="${day}">
+                                Selecionar Manhã (07:00 - 12:00)
+                            </button>
+                            <div class="time-inputs" id="${day}-morning" style="display: none;">
+                                <div class="time-input">
+                                    <input type="time" id="${day}_morning_start" name="${day}_morning_start" class="form-control" disabled>
+                                </div>
+                                <span>às</span>
+                                <div class="time-input">
+                                    <input type="time" id="${day}_morning_end" name="${day}_morning_end" class="form-control" disabled>
+                                </div>
+                                <div class="error-message" id="${day}_morning_error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="period-option">
+                            <div class="period-title">
+                                <i class="fas fa-cloud-sun"></i> Período da Tarde
+                            </div>
+                            <button type="button" class="period-btn" data-period="afternoon" data-day="${day}">
+                                Selecionar Tarde (13:00 - 18:00)
+                            </button>
+                            <div class="time-inputs" id="${day}-afternoon" style="display: none;">
+                                <div class="time-input">
+                                    <input type="time" id="${day}_afternoon_start" name="${day}_afternoon_start" class="form-control" disabled>
+                                </div>
+                                <span>às</span>
+                                <div class="time-input">
+                                    <input type="time" id="${day}_afternoon_end" name="${day}_afternoon_end" class="form-control" disabled>
+                                </div>
+                                <div class="error-message" id="${day}_afternoon_error"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="period-option">
+                            <div class="period-title">
+                                <i class="fas fa-moon"></i> Período da Noite
+                            </div>
+                            <button type="button" class="period-btn" data-period="night" data-day="${day}">
+                                Selecionar Noite (18:00 - 22:00)
+                            </button>
+                            <div class="time-inputs" id="${day}-night" style="display: none;">
+                                <div class="time-input">
+                                    <input type="time" id="${day}_night_start" name="${day}_night_start" class="form-control" disabled>
+                                </div>
+                                <span>às</span>
+                                <div class="time-input">
+                                    <input type="time" id="${day}_night_end" name="${day}_night_end" class="form-control" disabled>
+                                </div>
+                                <div class="error-message" id="${day}_night_error"></div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+                container.append(template);
+            });
+        }
+
+        function setupEventListeners() {
+            // Filtros encadeados
+            $('#unidade').on('change', function () {
+                const unidadeId = $(this).val();
+                if (unidadeId) {
+                    loadEspecialidades(unidadeId);
+                    $('#especialidade').prop('disabled', false);
+                    $('#profissional').prop('disabled', true).val('');
+                    $('#procedimento').prop('disabled', true).val('');
+                    disableFormFields();
+                } else {
+                    $('#especialidade').prop('disabled', true).val('');
+                    $('#profissional').prop('disabled', true).val('');
+                    $('#procedimento').prop('disabled', true).val('');
+                    disableFormFields();
+                }
+            });
+
+            $('#especialidade').on('change', function () {
+                const especialidadeId = $(this).val();
+                if (especialidadeId) {
+                    loadProfissionais(especialidadeId);
+                    $('#profissional').prop('disabled', false);
+                    $('#procedimento').prop('disabled', true).val('');
+                    disableFormFields();
+                } else {
+                    $('#profissional').prop('disabled', true).val('');
+                    $('#procedimento').prop('disabled', true).val('');
+                    disableFormFields();
+                }
+            });
+
+            $('#profissional').on('change', function () {
+                if ($(this).val()) {
+                    $('#procedimento').prop('disabled', false);
+                    enableFormFields();
+                    loadAgendas();
+                } else {
+                    $('#procedimento').prop('disabled', true).val('');
+                    disableFormFields();
+                }
+            });
+
+            // Busca de procedimentos
+            $('#procedimento').on('input', function () {
+                const termo = $(this).val();
+                const profissional = $('#profissional').val();
+                const especialidade = $('#especialidade').val();
+
+                if (termo.length >= 3 && profissional && especialidade) {
+                    buscarProcedimentos(termo, especialidade, profissional);
+                } else {
+                    $('#procedimento_suggestions').hide();
+                }
+            });
+
+            // Seletor de dias
+            $('.day-btn').on('click', function () {
+                $(this).toggleClass('active');
+                const day = $(this).data('day');
+                const schedule = $(`#schedule-${day}`);
+
+                if ($(this).hasClass('active')) {
+                    schedule.addClass('active');
+                } else {
+                    schedule.removeClass('active');
+                    $(`#${day}_full_start, #${day}_full_end, #${day}_morning_start, #${day}_morning_end, #${day}_afternoon_start, #${day}_afternoon_end, #${day}_night_start, #${day}_night_end`).prop('disabled', true).val('');
+                    $(`#${day}-full, #${day}-morning, #${day}-afternoon, #${day}-night`).hide();
+                    $(`.period-btn[data-day="${day}"]`).removeClass('active');
+                }
+            });
+
+            // Seleção de períodos
+            $(document).on('click', '.period-btn', function () {
+                const day = $(this).data('day');
+                const period = $(this).data('period');
+
+                // Desativa todos os períodos para este dia
+                $(`.period-btn[data-day="${day}"]`).removeClass('active');
+                $(`#${day}-full, #${day}-morning, #${day}-afternoon, #${day}-night`).hide();
+                $(`#${day}_full_start, #${day}_full_end, #${day}_morning_start, #${day}_morning_end, #${day}_afternoon_start, #${day}_afternoon_end, #${day}_night_start, #${day}_night_end`).prop('disabled', true).val('');
+
+                // Ativa o período selecionado
+                $(this).addClass('active');
+                $(`#${day}-${period}`).show();
+                $(`#${day}_${period}_start, #${day}_${period}_end`).prop('disabled', false);
+
+                // Preenche com horários padrão
+                if (period === 'morning') {
+                    $(`#${day}_morning_start`).val('07:00');
+                    $(`#${day}_morning_end`).val('12:00');
+                } else if (period === 'afternoon') {
+                    $(`#${day}_afternoon_start`).val('13:00');
+                    $(`#${day}_afternoon_end`).val('18:00');
+                } else if (period === 'night') {
+                    $(`#${day}_night_start`).val('18:00');
+                    $(`#${day}_night_end`).val('22:00');
+                }
+            });
+
+            // Validação de horários
+            $(document).on('blur', 'input[type="time"]', function () {
+                const id = $(this).attr('id');
+                const [day, period, type] = id.split('_');
+                const start = $(`#${day}_${period}_start`).val();
+                const end = $(`#${day}_${period}_end`).val();
+
+                if (!start || !end) return;
+
+                let isValid = true;
+                let errorMessage = '';
+
+                // Converter para minutos para facilitar comparação
+                const startMinutes = convertTimeToMinutes(start);
+                const endMinutes = convertTimeToMinutes(end);
+
+                // Validar de acordo com o período
+                if (period === 'morning') {
+                    if (startMinutes < convertTimeToMinutes('07:00') || endMinutes > convertTimeToMinutes('12:00')) {
+                        isValid = false;
+                        errorMessage = 'Período da manhã deve ser entre 07:00 e 12:00';
+                    }
+                } else if (period === 'afternoon') {
+                    if (startMinutes < convertTimeToMinutes('13:00') || endMinutes > convertTimeToMinutes('18:00')) {
+                        isValid = false;
+                        errorMessage = 'Período da tarde deve ser entre 13:00 e 18:00';
+                    }
+                } else if (period === 'night') {
+                    if (startMinutes < convertTimeToMinutes('18:00') || endMinutes > convertTimeToMinutes('22:00')) {
+                        isValid = false;
+                        errorMessage = 'Período da noite deve ser entre 18:00 e 22:00';
+                    }
+                }
+
+                // Validar se horário final é maior que inicial
+                if (startMinutes >= endMinutes) {
+                    isValid = false;
+                    errorMessage = 'Horário final deve ser após o horário inicial';
+                }
+
+                // Aplicar estilos de erro
+                if (!isValid) {
+                    $(`#${day}_${period}_start, #${day}_${period}_end`).addClass('error');
+                    $(`#${day}_${period}_error`).text(errorMessage).show();
+                    showToast(errorMessage, 'warning');
+                } else {
+                    $(`#${day}_${period}_start, #${day}_${period}_end`).removeClass('error');
+                    $(`#${day}_${period}_error`).hide();
+                }
+            });
+
+            // Tipo de agendamento
+            $('#tipo').on('change', function () {
+                const tipo = $(this).val();
+
+                if (tipo === '1') { // Ordem de chegada
+                    $('#quantidade_container').show();
+                    $('#duracao_container').hide();
+                    $('#quantidade_beneficiarios').prop('disabled', false);
+                    $('#duracao_atendimento').prop('disabled', true).val('');
+                } else if (tipo === '2') { // Horário marcado
+                    $('#quantidade_container').hide();
+                    $('#duracao_container').show();
+                    $('#duracao_atendimento').prop('disabled', false);
+                    $('#quantidade_beneficiarios').prop('disabled', true).val('');
+                } else {
+                    $('#quantidade_container').hide();
+                    $('#duracao_container').hide();
+                    $('#quantidade_beneficiarios').prop('disabled', true).val('');
+                    $('#duracao_atendimento').prop('disabled', true).val('');
+                }
+            });
+
+            // Validação da duração
+            $('#duracao_atendimento').on('blur', function () {
+                const duracao = parseInt($(this).val());
+                if (duracao < 20 || duracao > 120) {
+                    $(this).addClass('error');
+                    $('#duracao_error').show();
+                    showToast('Duração deve ser entre 20 e 120 minutos', 'warning');
+                } else {
+                    $(this).removeClass('error');
+                    $('#duracao_error').hide();
+                }
+            });
+
+            // Validação da faixa etária
+            $('#idade_min, #idade_max').on('blur', function () {
+                const min = parseInt($('#idade_min').val());
+                const max = parseInt($('#idade_max').val());
+
+                if (min && max && min > max) {
+                    $('#idade_min, #idade_max').addClass('error');
+                    $('#idade_error').show();
+                    showToast('Idade mínima não pode ser maior que a máxima', 'warning');
+                } else {
+                    $('#idade_min, #idade_max').removeClass('error');
+                    $('#idade_error').hide();
+                }
+            });
+
+            // Submit do formulário
+            $('#agendaForm').on('submit', function (e) {
+                e.preventDefault();
+
+                // Validar formulário antes de enviar
+                if (!validarFormularioAntesEnvio()) {
+                    return;
+                }
+
+                // Coletar todos os dados do formulário
+                const formData = coletarDadosFormulario();
+
+                // Aqui você pode enviar os dados via AJAX
+                console.log('Dados do formulário prontos para envio:', formData);
+
+                // Simular envio
+                showLoading();
+                setTimeout(() => {
+                    showToast('Agenda cadastrada com sucesso!', 'success');
+                    limparFormulario();
+                    loadAgendas();
+                    hideLoading();
+                }, 1500);
+            });
+
+            // Botão voltar
+            $('#voltarBtn').on('click', function () {
+                window.history.back();
+            });
+
+            // Validação em tempo real
+            $('#vigencia_inicio, #vigencia_fim').on('change', function () {
+                const inicio = new Date($('#vigencia_inicio').val());
+                const fim = new Date($('#vigencia_fim').val());
+
+                if (inicio && fim && inicio > fim) {
+                    showToast('A data de início não pode ser maior que a data de fim', 'warning');
+                    $('#vigencia_fim').val('');
+                }
+            });
+        }
+
+        function convertTimeToMinutes(time) {
+            const [hours, minutes] = time.split(':').map(Number);
+            return hours * 60 + minutes;
+        }
+
+        function coletarDadosFormulario() {
+            const diasSelecionados = [];
+            const horariosPorDia = {};
+
+            $('.day-btn.active').each(function () {
+                const day = $(this).data('day');
+                diasSelecionados.push(day);
+
+                // Coletar horários para cada dia selecionado
+                horariosPorDia[day] = {
+                    full: {
+                        start: $(`#${day}_full_start`).val(),
+                        end: $(`#${day}_full_end`).val()
+                    },
+                    morning: {
+                        start: $(`#${day}_morning_start`).val(),
+                        end: $(`#${day}_morning_end`).val()
+                    },
+                    afternoon: {
+                        start: $(`#${day}_afternoon_start`).val(),
+                        end: $(`#${day}_afternoon_end`).val()
+                    },
+                    night: {
+                        start: $(`#${day}_night_start`).val(),
+                        end: $(`#${day}_night_end`).val()
+                    }
+                };
+            });
+
+            return {
+                unidade: $('#unidade').val(),
+                especialidade: $('#especialidade').val(),
+                profissional: $('#profissional').val(),
+                procedimento: $('#procedimento').val(),
+                procedimento_codigo: $('#procedimento').attr('data-codigo'),
+                vigencia_inicio: $('#vigencia_inicio').val(),
+                vigencia_fim: $('#vigencia_fim').val(),
+                dias_agendamento: diasSelecionados,
+                horarios: horariosPorDia,
+                tipo: $('#tipo').val(),
+                idade_min: $('#idade_min').val(),
+                idade_max: $('#idade_max').val(),
+                quantidade_beneficiarios: $('#tipo').val() === '1' ? $('#quantidade_beneficiarios').val() : null,
+                duracao_atendimento: $('#tipo').val() === '2' ? $('#duracao_atendimento').val() : null
+            };
+        }
+
+        function validarFormularioAntesEnvio() {
+            let isValid = true;
+
+            // Validar campos obrigatórios
+            if (!$('#unidade').val()) {
+                showToast('Selecione uma unidade', 'warning');
+                isValid = false;
+            }
+
+            if (!$('#especialidade').val()) {
+                showToast('Selecione uma especialidade', 'warning');
+                isValid = false;
+            }
+
+            if (!$('#profissional').val()) {
+                showToast('Selecione um profissional', 'warning');
+                isValid = false;
+            }
+
+            if (!$('#procedimento').val()) {
+                showToast('Informe o procedimento', 'warning');
+                isValid = false;
+            }
+
+            if (!$('#tipo').val()) {
+                showToast('Selecione o tipo de agendamento', 'warning');
+                isValid = false;
+            }
+
+            if ($('#tipo').val() === '1' && !$('#quantidade_beneficiarios').val()) {
+                showToast('Informe a quantidade de beneficiários', 'warning');
+                isValid = false;
+            }
+
+            if ($('#tipo').val() === '2' && !$('#duracao_atendimento').val()) {
+                showToast('Informe a duração do atendimento', 'warning');
+                isValid = false;
+            }
+
+            if (!$('#idade_min').val() || !$('#idade_max').val()) {
+                showToast('Informe a faixa etária', 'warning');
+                isValid = false;
+            }
+
+            // Validar dias selecionados
+            const diasSelecionados = $('.day-btn.active').length;
+            if (diasSelecionados === 0) {
+                showToast('Selecione pelo menos um dia da semana', 'warning');
+                isValid = false;
+            }
+
+            // Validar horários para cada dia selecionado
+            $('.day-btn.active').each(function () {
+                const day = $(this).data('day');
+                const hasFull = $(`#${day}_full_start`).val() && $(`#${day}_full_end`).val();
+                const hasMorning = $(`#${day}_morning_start`).val() && $(`#${day}_morning_end`).val();
+                const hasAfternoon = $(`#${day}_afternoon_start`).val() && $(`#${day}_afternoon_end`).val();
+                const hasNight = $(`#${day}_night_start`).val() && $(`#${day}_night_end`).val();
+
+                if (!hasFull && !hasMorning && !hasAfternoon && !hasNight) {
+                    showToast(`Informe os horários para ${day}`, 'warning');
+                    isValid = false;
+                    return false; // Sai do each
+                }
+            });
+
+            return isValid;
+        }
+
+        function enableFormFields() {
+            $('#vigencia_inicio, #vigencia_fim, #tipo, #idade_min, #idade_max').prop('disabled', false);
+            $('.day-btn').prop('disabled', false);
+            $('#cadastrarBtn').prop('disabled', false);
+        }
+
+        function disableFormFields() {
+            $('#vigencia_inicio, #vigencia_fim, #tipo, #idade_min, #idade_max').prop('disabled', true);
+            $('.day-btn').prop('disabled', true).removeClass('active');
+            $('.day-schedule').removeClass('active');
+            $('input[type="time"]').prop('disabled', true).val('');
+            $('#quantidade_beneficiarios, #duracao_atendimento').prop('disabled', true).val('');
+            $('#quantidade_container, #duracao_container').hide();
+            $('#cadastrarBtn').prop('disabled', true);
+        }
+
+        function loadEspecialidades(unidadeId) {
+            showLoading();
+            $('#especialidade').html('<option value="">Carregando...</option>');
+
+            // Simular requisição AJAX
+            setTimeout(() => {
+                const especialidades = [
+                    { id: 1, nome: 'Psicopedagogia' },
+                    { id: 2, nome: 'Cardiologia' },
+                    { id: 3, nome: 'Neurologia' },
+                    { id: 4, nome: 'Pediatria' },
+                    { id: 5, nome: 'Ginecologia' }
+                ];
+
+                let options = '<option value="">Selecione uma especialidade</option>';
+                especialidades.forEach(esp => {
+                    options += `<option value="${esp.id}">${esp.nome}</option>`;
+                });
+
+                $('#especialidade').html(options);
+                hideLoading();
+            }, 500);
+        }
+
+        function loadProfissionais(especialidadeId) {
+            showLoading();
+            $('#profissional').html('<option value="">Carregando...</option>');
+
+            // Simular requisição AJAX
+            setTimeout(() => {
+                let profissionais = [];
+
+                if (especialidadeId === '1') {
+                    profissionais = [
+                        { id: 1, nome: 'ALANE MARIA FRANCELINO DE ALMEIDA SANTOS' },
+                        { id: 2, nome: 'CARLOS EDUARDO SILVA' }
+                    ];
+                } else if (especialidadeId === '2') {
+                    profissionais = [
+                        { id: 3, nome: 'MARIA FERNANDA OLIVEIRA' },
+                        { id: 4, nome: 'JOSÉ CARLOS PEREIRA' }
+                    ];
+                } else {
+                    profissionais = [
+                        { id: 5, nome: 'ANA PAULA COSTA' },
+                        { id: 6, nome: 'ROBERTO SANTOS' },
+                        { id: 7, nome: 'PATRICIA MENDES' }
+                    ];
+                }
+
+                let options = '<option value="">Selecione um profissional</option>';
+                profissionais.forEach(prof => {
+                    options += `<option value="${prof.id}">${prof.nome}</option>`;
+                });
+
+                $('#profissional').html(options);
+                hideLoading();
+            }, 500);
+        }
+
+        function buscarProcedimentos(termo, especialidade, profissional) {
+            showLoading();
+
+            // Simular delay de requisição
+            setTimeout(() => {
+                let procedimentos = [];
+
+                // Dados de exemplo baseados nos filtros
+                if (especialidade === '1') { // Psicopedagogia
+                    procedimentos = [
+                        { codigo: 'P001', nome: 'Consulta Psicopedagógica', descricao: 'Avaliação psicopedagógica completa' },
+                        { codigo: 'P002', nome: 'Acompanhamento Psicopedagógico', descricao: 'Sessão de acompanhamento' },
+                        { codigo: 'P003', nome: 'Orientação Educacional', descricao: 'Orientação para pais e educadores' }
+                    ];
+                } else if (especialidade === '2') { // Cardiologia
+                    procedimentos = [
+                        { codigo: 'C001', nome: 'Consulta Cardiológica', descricao: 'Avaliação cardiológica básica' },
+                        { codigo: 'C002', nome: 'Eletrocardiograma', descricao: 'Exame de ECG' },
+                        { codigo: 'C003', nome: 'Teste Ergométrico', descricao: 'Teste de esforço' }
+                    ];
+                } else {
+                    procedimentos = [
+                        { codigo: 'G001', nome: 'Consulta Geral', descricao: 'Consulta médica geral' },
+                        { codigo: 'G002', nome: 'Exame Clínico', descricao: 'Exame físico completo' }
+                    ];
+                }
+
+                // Filtrar pelo termo de busca
+                const resultados = procedimentos.filter(proc =>
+                    proc.nome.toLowerCase().includes(termo.toLowerCase()) ||
+                    proc.descricao.toLowerCase().includes(termo.toLowerCase())
+                );
+
+                exibirSugestoesProcedimentos(resultados);
+                hideLoading();
+            }, 500);
+        }
+
+        function exibirSugestoesProcedimentos(procedimentos) {
+            const suggestions = $('#procedimento_suggestions');
+            suggestions.empty();
+
+            if (procedimentos.length === 0) {
+                suggestions.append('<div class="suggestion-item">Nenhum procedimento encontrado</div>');
+            } else {
+                procedimentos.forEach(proc => {
+                    const item = $(`
+                        <div class="suggestion-item" data-codigo="${proc.codigo}" data-nome="${proc.nome}">
+                            <strong>${proc.nome}</strong>
+                            <small>${proc.descricao}</small>
+                        </div>
+                    `);
+
+                    item.on('click', function () {
+                        $('#procedimento').val(proc.nome);
+                        $('#procedimento').attr('data-codigo', proc.codigo);
+                        suggestions.hide();
+                    });
+
+                    suggestions.append(item);
+                });
+            }
+
+            suggestions.show();
+        }
+
+        function loadAgendas() {
+            const profissional = $('#profissional').val();
+            if (!profissional) {
+                $('#agendasTable').html(`
+                    <tr>
+                        <td colspan="10" class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>Selecione um profissional para visualizar as agendas</p>
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+
+            // Simular carregamento
+            showLoading();
+            setTimeout(() => {
+                loadMockedAgendas();
+                hideLoading();
+            }, 500);
+        }
+
+        function loadMockedAgendas() {
+            const tbody = $('#agendasTable');
+            tbody.empty();
+
+            const mockedAgendas = [
+                {
+                    id: 1,
+                    codigo: 'AG001',
+                    vigencia_inicio: '2025-07-10',
+                    vigencia_fim: '2025-12-31',
+                    dias_agendamento: 'SEG, TER, QUI',
+                    horarios: {
+                        SEG: {
+                            morning: { start: '08:00', end: '12:00' }
+                        },
+                        TER: {
+                            afternoon: { start: '14:00', end: '18:00' }
+                        },
+                        QUI: {
+                            night: { start: '18:00', end: '22:00' }
+                        }
+                    },
+                    especialidade: 'Psicopedagogia',
+                    procedimento: 'Consulta Psicopedagógica',
+                    tipo: '2',
+                    idade_min: 5,
+                    idade_max: 18,
+                    duracao_atendimento: 30,
+                    ativa: true
+                },
+                {
+                    id: 2,
+                    codigo: 'AG002',
+                    vigencia_inicio: '2025-07-15',
+                    vigencia_fim: '2025-11-30',
+                    dias_agendamento: 'TER, SEX',
+                    horarios: {
+                        TER: {
+                            full: { start: '08:00', end: '18:00' }
+                        },
+                        SEX: {
+                            morning: { start: '07:00', end: '12:00' },
+                            afternoon: { start: '13:00', end: '17:00' }
+                        }
+                    },
+                    especialidade: 'Cardiologia',
+                    procedimento: 'Consulta Cardiológica',
+                    tipo: '1',
+                    idade_min: 18,
+                    idade_max: 80,
+                    quantidade_beneficiarios: 15,
+                    ativa: false
+                },
+                {
+                    id: 3,
+                    codigo: 'AG003',
+                    vigencia_inicio: '2025-08-01',
+                    vigencia_fim: '2025-10-31',
+                    dias_agendamento: 'QUA, SAB',
+                    horarios: {
+                        QUA: {
+                            afternoon: { start: '13:00', end: '18:00' }
+                        },
+                        SAB: {
+                            morning: { start: '08:00', end: '12:00' }
+                        }
+                    },
+                    especialidade: 'Pediatria',
+                    procedimento: 'Consulta Pediátrica',
+                    tipo: '2',
+                    idade_min: 0,
+                    idade_max: 12,
+                    duracao_atendimento: 40,
+                    ativa: true
+                }
+            ];
+
+            if (mockedAgendas.length === 0) {
+                tbody.append(`
+                    <tr>
+                        <td colspan="10" class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <p>Nenhuma agenda cadastrada para este profissional</p>
+                        </td>
+                    </tr>
+                `);
+                return;
+            }
+
+            mockedAgendas.forEach(agenda => {
+                const statusClass = agenda.ativa ? 'status-active' : 'status-inactive';
+                const statusText = agenda.ativa ? 'Ativo' : 'Inativo';
+
+                const row = $(`
+                    <tr>
+                        <td>${agenda.codigo}</td>
+                        <td>${formatarPeriodo(agenda.vigencia_inicio, agenda.vigencia_fim)}</td>
+                        <td>${agenda.dias_agendamento}</td>
+                        <td>${formatarHorarios(agenda.horarios)}</td>
+                        <td>${agenda.especialidade}</td>
+                        <td>${agenda.procedimento}</td>
+                        <td>${formatarTipoAgendamento(agenda.tipo)}</td>
+                        <td>${agenda.idade_min} - ${agenda.idade_max}</td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>
+                            ${agenda.ativa ?
+                        `<button class="action-btn btn-edit" onclick="desativarAgenda(${agenda.id})">
+                                    <i class="fas fa-pause"></i> DESATIVAR
+                                </button>` :
+                        `<button class="action-btn btn-activate" onclick="ativarAgenda(${agenda.id})">
+                                    <i class="fas fa-play"></i> ATIVAR
+                                </button>`}
+                            <button class="action-btn btn-delete" onclick="excluirAgenda(${agenda.id})">
+                                <i class="fas fa-trash"></i> EXCLUIR
+                            </button>
+                        </td>
+                    </tr>
+                `);
+                tbody.append(row);
+            });
+        }
+
+        function formatarPeriodo(inicio, fim) {
+            const dataInicio = new Date(inicio).toLocaleDateString('pt-BR');
+            const dataFim = new Date(fim).toLocaleDateString('pt-BR');
+            return `${dataInicio} até ${dataFim}`;
+        }
+
+        function formatarHorarios(horarios) {
+            let result = '';
+            for (const day in horarios) {
+                const h = horarios[day];
+                result += `<strong>${day}:</strong> `;
+
+                if (h.full && h.full.start && h.full.end) {
+                    result += `Completo (${h.full.start} às ${h.full.end})<br>`;
+                } else {
+                    if (h.morning && h.morning.start && h.morning.end) {
+                        result += `Manhã (${h.morning.start} às ${h.morning.end}) `;
+                    }
+                    if (h.afternoon && h.afternoon.start && h.afternoon.end) {
+                        result += `Tarde (${h.afternoon.start} às ${h.afternoon.end}) `;
+                    }
+                    if (h.night && h.night.start && h.night.end) {
+                        result += `Noite (${h.night.start} às ${h.night.end})`;
+                    }
+                    result += '<br>';
+                }
+            }
+            return result;
+        }
+
+        function formatarTipoAgendamento(tipo) {
+            const tipos = {
+                '1': 'Ordem de Chegada',
+                '2': 'Horário Marcado',
+                '3': 'Encaixe'
+            };
+            return tipos[tipo] || tipo;
+        }
+
+        function ativarAgenda(id) {
+            Swal.fire({
+                title: 'Ativar Agenda',
+                text: 'Tem certeza que deseja ativar esta agenda?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, ativar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#00CEC9',
+                cancelButtonColor: '#6C5CE7'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showLoading();
+
+                    // Simular requisição AJAX
+                    setTimeout(() => {
+                        showToast('Agenda ativada com sucesso!', 'success');
+                        loadAgendas();
+                        hideLoading();
+                    }, 1000);
+                }
+            });
+        }
+
+        function desativarAgenda(id) {
+            Swal.fire({
+                title: 'Desativar Agenda',
+                text: 'Tem certeza que deseja desativar esta agenda?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, desativar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#FD79A8',
+                cancelButtonColor: '#6C5CE7'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showLoading();
+
+                    // Simular requisição AJAX
+                    setTimeout(() => {
+                        showToast('Agenda desativada com sucesso!', 'success');
+                        loadAgendas();
+                        hideLoading();
+                    }, 1000);
+                }
+            });
+        }
+
+        function excluirAgenda(id) {
+            Swal.fire({
+                title: 'Excluir Agenda',
+                text: 'Esta ação não pode ser desfeita. Tem certeza que deseja excluir esta agenda?',
+                icon: 'error',
+                showCancelButton: true,
+                confirmButtonText: 'Sim, excluir',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#E84118',
+                cancelButtonColor: '#6C5CE7'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    showLoading();
+
+                    // Simular requisição AJAX
+                    setTimeout(() => {
+                        showToast('Agenda excluída com sucesso!', 'success');
+                        loadAgendas();
+                        hideLoading();
+                    }, 1000);
+                }
+            });
+        }
+
+        function limparFormulario() {
+            $('#agendaForm')[0].reset();
+            $('.day-btn').removeClass('active');
+            $('.day-schedule').removeClass('active');
+            $('.period-btn').removeClass('active');
+            $('input[type="time"]').val('');
+            $('.time-inputs').hide();
+            $('#procedimento').removeAttr('data-codigo');
+            $('#procedimento_suggestions').hide();
+            $('#quantidade_container, #duracao_container').hide();
+
+            // Reconfigurar valores padrão
+            initializeComponents();
+        }
+
+        function showLoading() {
+            $('#loading').show();
+        }
+
+        function hideLoading() {
+            $('#loading').hide();
+        }
+
+        function showToast(message, type = 'info') {
+            const icons = {
+                success: 'success',
+                error: 'error',
+                warning: 'warning',
+                info: 'info'
+            };
+
+            const colors = {
+                success: '#4CD137',
+                error: '#E84118',
+                warning: '#FFA500',
+                info: '#6C5CE7'
+            };
+
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                icon: icons[type],
+                title: message,
+                background: '#ffffff',
+                color: colors[type],
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer);
+                    toast.addEventListener('mouseleave', Swal.resumeTimer);
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
